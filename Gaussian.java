@@ -47,8 +47,8 @@ public class Gaussian {
 				vectorB[i] = Double.parseDouble(row[i]);
 			}
 			
-			System.out.print(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
-			
+			//System.out.print(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
+			//SPPFwdElimination(coeffMatrix,vectorB);
 			bufferedReader.close();
 			
 		
@@ -103,11 +103,66 @@ public class Gaussian {
 		return sol;
 		
 	}
-	public static String SPPFwdElimination( ) {
-		return null;	
+	public static void SPPFwdElimination(double[][] coeffMatrix, double[] vectorB, double[] ind) {
+		double[] scaling = new double[arraySize];
+		double smax = 0;
+		// Initialize index and scaling vectors
+		for(int i = 0; i < arraySize; i++) {
+			for(int j = 0; j < arraySize; j++) {
+				smax = Math.abs(Math.max(smax, coeffMatrix[i][j]));
+			}//end force
+			scaling[i] = smax;
+		}//end for
+		
+		for(int k = 0; k < arraySize -1; k++) {
+			double rmax = 0;
+			double maxInd = k;
+			double r;
+			for(int i = k; i < arraySize; i++) {
+				//ratio of coefficient to scaling factor
+				r = Math.abs(coeffMatrix[(int) ind[i]][k] / scaling[(int) ind[i]]);
+				if( r> rmax) {
+					rmax = r;
+					maxInd = i;
+				}//end if		
+			}//end for
+			//swap(ind[maxInd, ind[k]
+			double temp = ind[(int) maxInd];
+			ind[(int)maxInd] = ind[k];
+			ind[k] = temp;
+			
+			for(int i = k+1; i < arraySize; i++) {
+				double mult = coeffMatrix[(int)ind[i]][k] / coeffMatrix[(int)ind[k]][k];
+				for(int j = k+1; j < arraySize; j++) {
+					coeffMatrix[(int)ind[i]][j] = coeffMatrix[(int)ind[i]][j] - (mult * coeffMatrix[(int)ind[k]][j]);
+				}//end for
+				
+				vectorB[(int)ind[i]] = vectorB[(int)ind[i]] - mult * vectorB[(int)ind[k]];
+			}//end for
+		}//end for
+			System.out.println(Arrays.deepToString(coeffMatrix));
+			System.out.println(Arrays.toString(vectorB));
+	}//end function
+	public static void SPPBackSubst(double[][] coeffMatrix, double[] vectorB, double[] sol, double[] ind ) {
+		sol[arraySize] = vectorB[(int)ind[arraySize]] / coeffMatrix[(int)ind[arraySize]][arraySize];
+		double sum;
+		for( int i = (arraySize-2); i < arraySize; i++) {
+			sum = vectorB[(int)ind[i]];
+			for(int j = i+1; j < arraySize; j++) {
+				sum = sum - (coeffMatrix[(int)ind[i]][j] * sol[j]);
+			}//end for
+			sol[i] = sum /coeffMatrix[(int)ind[i]][i];
+		}//end for
+	}//end function
+	public static void SPPGaussian(double[][] coeffMatrix, double[] vectorB) {
+		double[] sol = new double[arraySize];
+		double[] ind = new double[arraySize];
+		
+		for(int i = 0; i < arraySize; i++) {
+			ind[i] = i;
+		}//end for
+		
+		SPPFwdElimination(coeffMatrix, vectorB, ind);
+		SPPBackSubst(coeffMatrix, vectorB, sol, ind);
 	}
-	public static String SPPBackSubst( ) {
-		return null;
-	}
-	
 }
