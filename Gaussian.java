@@ -47,10 +47,12 @@ public class Gaussian {
 				vectorB[i] = Double.parseDouble(row[i]);
 			}
 			
-			FwdElimination(coeffMatrix,vectorB);
+			System.out.print(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
 			
 			bufferedReader.close();
-
+			
+		
+		
 		}//end try
 		catch(FileNotFoundException e) {
 		} 
@@ -80,25 +82,27 @@ public class Gaussian {
 				vectorB[i] = (vectorB[i] - (mult * vectorB[k]));
 			}//end for
 		}//end for
-		System.out.println(Arrays.deepToString(coeffMatrix));
-		System.out.print(Arrays.toString(vectorB));
-		//BackSubt(coeffMatrix,vectorB, 4);
+		
 	}//end FwdElimination
 	
-	public static double[] BackSubt(double[][] coeffMatrix, double[] consta, int arraySize) {
+	public static void BackSubt(double[][] coeffMatrix, double[] consta,double[] solution) {
 
-		double[] solution = new double[arraySize];
 		solution[arraySize-1] = consta[arraySize-1] / coeffMatrix[arraySize-1][arraySize-1]; 
 		for(int i = arraySize-2; i > -1; i--) {
 			double sum = consta[i];
-			for(int j = i+1; i < arraySize; j++) {
+			for(int j = i+1; j < arraySize; j++) {
 				sum = sum - (coeffMatrix[i][j] * solution[j]);
 			}//end for
 			solution[i] = (sum / coeffMatrix[i][i]);
 		}
-		return solution;
 	}
-
+	public static double[] NaiveGaussian(double[][] coeffMatrix, double[] vectorB) {
+		double[] sol = new double[arraySize];
+		FwdElimination(coeffMatrix,vectorB);
+		BackSubt(coeffMatrix,vectorB,sol);
+		return sol;
+		
+	}
 	public static String SPPFwdElimination( ) {
 		return null;	
 	}
