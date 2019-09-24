@@ -81,21 +81,25 @@ public class Gaussian {
 			}//end for
 		}//end for
 		System.out.println(Arrays.deepToString(coeffMatrix));
-		System.out.print(Arrays.toString(vectorB));
-		//BackSubt(coeffMatrix,vectorB, 4);
+		System.out.println(Arrays.toString(vectorB));
+		BackSubt(coeffMatrix,vectorB);
 	}//end FwdElimination
 	
-	public static double[] BackSubt(double[][] coeffMatrix, double[] consta, int arraySize) {
+	public static double[] BackSubt(double[][] coeffMatrix, double[] vectorB) {
 
 		double[] solution = new double[arraySize];
-		solution[arraySize-1] = consta[arraySize-1] / coeffMatrix[arraySize-1][arraySize-1]; 
+		solution[arraySize-1] = vectorB[arraySize-1] / (coeffMatrix[arraySize-1][arraySize-1]);
+		System.out.println(Arrays.toString(solution));
+		
 		for(int i = arraySize-2; i > -1; i--) {
-			double sum = consta[i];
-			for(int j = i+1; i < arraySize; j++) {
+			double sum = vectorB[i];
+			for(int j = i+1; j < arraySize; j++) {
 				sum = sum - (coeffMatrix[i][j] * solution[j]);
 			}//end for
 			solution[i] = (sum / coeffMatrix[i][i]);
 		}
+		System.out.println(Arrays.toString(solution));
+		
 		return solution;
 	}
 
