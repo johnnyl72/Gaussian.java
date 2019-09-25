@@ -6,18 +6,27 @@ import java.io.*;
 public class Gaussian {
 
 	public static int arraySize;
+	public static String fileName = "";
+	public static String solutionName = "";
+	public static String[] delim;
+	
 	public static void main(String[] args) throws FileNotFoundException {
-/*
+
 		//Boolean flag to determine which method to use
-		if (!args[0].equalsIgnoreCase("--spp")) {
-			System.out.prdoubleln("Naive Gaussian Elimination");
+		if(args[0].equalsIgnoreCase("--spp")) {
+			System.out.println("Gaussian Elimination with Scaled Partial Pivoting");
+
+			fileName = args[1];
+			delim = fileName.split("\\.");
+			solutionName = delim[0] + "." + "sol";
 		}
-		else
-			System.out.prdouble("Gaussian Elimination with Scaled Partial Pivoting");
-*/
-		//Static files for now, implement dynamic files next iteration
-		String fileName = "sys1.lin";
-		String solutionName = "sys1.sol";
+		else {
+			System.out.println("Regular Gaussian Elimination");
+			
+			fileName = args[0];
+			delim = fileName.split("\\.");
+			solutionName = delim[0] + "." + "sol";
+		}
 		
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
@@ -34,30 +43,29 @@ public class Gaussian {
 			//Read in linear systems for coefficent matrix
 			for(int i = 0; i < arraySize; i++) {
 				line = bufferedReader.readLine();
-				row = line.split(" ");
+				row = line.split("\\s+");
 				for(int j = 0; j < arraySize; j++) {
 					coeffMatrix[i][j] = Double.parseDouble(row[j]);
 				}
 			}
-
 			//Read last line for vector matrix
 			line = bufferedReader.readLine();
-			row = line.split(" ");
+			row = line.split("\\s+");
 			for(int i = 0; i < arraySize; i++) {
 				vectorB[i] = Double.parseDouble(row[i]);
 			}
 			
-			//System.out.println(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
-			SPPGaussian(coeffMatrix,vectorB);
+			//NaiveGaussian(coeffMatrix,vectorB);
+			System.out.print(Arrays.toString(SPPGaussian(coeffMatrix,vectorB)));
 			bufferedReader.close();
-			
-		
-		
+	
 		}//end try
+		
 		catch(FileNotFoundException e) {
 		} 
 		catch(IOException e) {
-		}//end catch	
+		}//end catch
+		
 		//Writer 
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(solutionName));	
@@ -66,7 +74,7 @@ public class Gaussian {
 		}
 		catch(IOException e) {	
 		}
-		
+	
 	
 	}//end main
 	
@@ -116,8 +124,6 @@ public class Gaussian {
 			scaling[i] = smax;
 		}//end for
 		
-		
-		
 		int maxInd;	
 		double r;
 		for(int k = 0; k < (arraySize-1); k++) {
@@ -147,8 +153,7 @@ public class Gaussian {
 				vectorB[ind[i]] = vectorB[ind[i]] - (mult * vectorB[ind[k]]);
 			}//end for
 		}//end for
-		
-		//System.out.print(Arrays.deepToString(coeffMatrix));
+
 			
 	}//end function
 	public static void SPPBackSubst(double[][] coeffMatrix, double[] vectorB, double[] sol, int[] ind ) {
@@ -161,9 +166,8 @@ public class Gaussian {
 			}//end for
 			sol[i] = sum / coeffMatrix[ind[i]][i];
 		}//end for
-		System.out.println(Arrays.toString(sol));
 	}//end function
-	public static void SPPGaussian(double[][] coeffMatrix, double[] vectorB) {
+	public static double[] SPPGaussian(double[][] coeffMatrix, double[] vectorB) {
 		double[] sol = new double[arraySize];
 		int[] ind = new int[arraySize]; //Index array
 		
@@ -173,5 +177,6 @@ public class Gaussian {
 		
 		SPPFwdElimination(coeffMatrix, vectorB, ind);
 		SPPBackSubst(coeffMatrix, vectorB, sol, ind);
+		return sol;
 	}
 }
