@@ -9,17 +9,8 @@ import java.util.Arrays;
 public class Test {
 	
 	public static void main(String[] args) {
-		String apples;
-		String[] delim;
-	
-		String[] argss = {"--sp","leroooy.jinkkins"};
-		apples = argss[1];
-		delim = apples.split("\\.");
-		 for (String a: delim)
-	            System.out.println(a);
-		 
-		 
-
+	double[] apple = {1, 2 , 4 , 5.666};
+	System.out.print(Arrays.toString(apple));
 	}
 		
 	

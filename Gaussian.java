@@ -9,25 +9,35 @@ public class Gaussian {
 	public static String fileName = "";
 	public static String solutionName = "";
 	public static String[] delim;
-	
+	public static boolean useSPP;
 	public static void main(String[] args) throws FileNotFoundException {
 
 		//Boolean flag to determine which method to use
+		//Read .lin file from argument and writes to a .sol file
 		if(args[0].equalsIgnoreCase("--spp")) {
+			useSPP = true;
 			System.out.println("Gaussian Elimination with Scaled Partial Pivoting");
 
 			fileName = args[1];
 			delim = fileName.split("\\.");
 			solutionName = delim[0] + "." + "sol";
+			readAndWrite(fileName,solutionName);
+		
 		}
 		else {
+			useSPP = false;
 			System.out.println("Regular Gaussian Elimination");
 			
 			fileName = args[0];
 			delim = fileName.split("\\.");
 			solutionName = delim[0] + "." + "sol";
+			readAndWrite(fileName,solutionName);
 		}
-		
+		System.exit(0);
+	
+	}//end main
+	
+	public static void readAndWrite(String fileName,String solutionName) {
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
 			
@@ -38,7 +48,6 @@ public class Gaussian {
 			
 			String line = null;
 			String[] row = null;
-			
 			
 			//Read in linear systems for coefficent matrix
 			for(int i = 0; i < arraySize; i++) {
@@ -55,8 +64,20 @@ public class Gaussian {
 				vectorB[i] = Double.parseDouble(row[i]);
 			}
 			
-			//NaiveGaussian(coeffMatrix,vectorB);
-			System.out.print(Arrays.toString(SPPGaussian(coeffMatrix,vectorB)));
+			double[] solution;
+			String answer;
+			if(useSPP) {
+				solution = NaiveGaussian(coeffMatrix,vectorB);
+				answer = Arrays.toString(solution);
+				answer = answer.replaceAll("\\[", "").replaceAll("\\]","");
+				writeEntries(answer,solutionName);
+			}
+			else {
+				solution = SPPGaussian(coeffMatrix,vectorB);
+				answer = Arrays.toString(solution);
+				answer = answer.replaceAll("\\[", "").replaceAll("\\]","");
+				writeEntries(answer,solutionName);
+			}
 			bufferedReader.close();
 	
 		}//end try
@@ -66,17 +87,19 @@ public class Gaussian {
 		catch(IOException e) {
 		}//end catch
 		
+		
+	}//end readEntries
+	public static void writeEntries(String answer, String solutionFile) {
 		//Writer 
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(solutionName));	
-			/** TBD */
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(solutionName));
+			
+			bufferedWriter.write(answer);
             bufferedWriter.close();	
 		}
 		catch(IOException e) {	
 		}
-	
-	
-	}//end main
+	}
 	
 	public static void FwdElimination(double[][] coeffMatrix, double[] vectorB) {
 
