@@ -1,4 +1,4 @@
-//package cs3010;
+package cs3010;
 import java.util.*;
 import java.io.*;
 
@@ -6,12 +6,12 @@ import java.io.*;
 public class Gaussian {
 
 	public static int arraySize;
-	public static String fileName = "";
-	public static String solutionName = "";
-	public static String[] delim;
 	public static boolean useSPP;
-	public static void main(String[] args) throws FileNotFoundException {
-
+	
+	public static void main(String[] args){
+		String[] delim;
+		String fileName;
+		String solutionName;
 		//Boolean flag to determine which method to use
 		//Read .lin file from argument and writes to a .sol file
 		if(args[0].equalsIgnoreCase("--spp")) {
@@ -66,6 +66,8 @@ public class Gaussian {
 			
 			double[] solution;
 			String answer;
+			
+			//Call writeEntries method
 			if(useSPP) {
 				solution = NaiveGaussian(coeffMatrix,vectorB);
 				answer = Arrays.toString(solution);
@@ -92,7 +94,7 @@ public class Gaussian {
 	public static void writeEntries(String answer, String solutionFile) {
 		//Writer 
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(solutionName));
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(solutionFile));
 			
 			bufferedWriter.write(answer);
             bufferedWriter.close();	
@@ -142,15 +144,16 @@ public class Gaussian {
 		for(int i = 0; i < arraySize; i++) {
 			smax = 0;
 			for(int j = 0; j < arraySize; j++) {
-				smax = Math.max(Math.abs(smax), Math.abs(coeffMatrix[i][j]));
+				smax = Math.max(smax, Math.abs(coeffMatrix[i][j]));
 			}//end force
 			scaling[i] = smax;
 		}//end for
 		
 		int maxInd;	
 		double r;
+		double rmax;
 		for(int k = 0; k < (arraySize-1); k++) {
-			double rmax = 0;
+			rmax = 0;
 			maxInd = k; // Index vector
 			
 			for(int i = k; i < arraySize; i++) {
@@ -166,9 +169,9 @@ public class Gaussian {
 			int temp = ind[maxInd];
 			ind[maxInd] = ind[k];
 			ind[k] = temp;
-			
+			double mult;
 			for(int i = k+1; i < arraySize; i++) {
-				double mult = (coeffMatrix[ind[i]][k]) / (coeffMatrix[ind[k]][k]);
+				mult = (coeffMatrix[ind[i]][k]) / (coeffMatrix[ind[k]][k]);
 				for(int j = k+1; j < arraySize; j++) {
 					coeffMatrix[ind[i]][j] = coeffMatrix[ind[i]][j] - (mult * coeffMatrix[ind[k]][j]);
 				}//end for
@@ -176,8 +179,6 @@ public class Gaussian {
 				vectorB[ind[i]] = vectorB[ind[i]] - (mult * vectorB[ind[k]]);
 			}//end for
 		}//end for
-
-			
 	}//end function
 	public static void SPPBackSubst(double[][] coeffMatrix, double[] vectorB, double[] sol, int[] ind ) {
 		sol[arraySize-1] = vectorB[ind[arraySize-1]] / coeffMatrix[ind[arraySize-1]][arraySize-1];
