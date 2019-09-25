@@ -47,8 +47,8 @@ public class Gaussian {
 				vectorB[i] = Double.parseDouble(row[i]);
 			}
 			
-			//System.out.print(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
-			//SPPFwdElimination(coeffMatrix,vectorB);
+			//System.out.println(Arrays.toString(NaiveGaussian(coeffMatrix,vectorB)));
+			SPPGaussian(coeffMatrix,vectorB);
 			bufferedReader.close();
 			
 		
@@ -84,7 +84,6 @@ public class Gaussian {
 		}//end for
 		
 	}//end FwdElimination
-	
 	public static void BackSubt(double[][] coeffMatrix, double[] consta,double[] solution) {
 
 		solution[arraySize-1] = consta[arraySize-1] / coeffMatrix[arraySize-1][arraySize-1]; 
@@ -97,66 +96,76 @@ public class Gaussian {
 		}
 	}
 	public static double[] NaiveGaussian(double[][] coeffMatrix, double[] vectorB) {
+
 		double[] sol = new double[arraySize];
 		FwdElimination(coeffMatrix,vectorB);
 		BackSubt(coeffMatrix,vectorB,sol);
 		return sol;
 		
 	}
-	public static void SPPFwdElimination(double[][] coeffMatrix, double[] vectorB, double[] ind) {
+	
+	public static void SPPFwdElimination(double[][] coeffMatrix, double[] vectorB, int[] ind) {
 		double[] scaling = new double[arraySize];
-		double smax = 0;
+		double smax;
 		// Initialize index and scaling vectors
 		for(int i = 0; i < arraySize; i++) {
+			smax = 0;
 			for(int j = 0; j < arraySize; j++) {
-				smax = Math.abs(Math.max(smax, coeffMatrix[i][j]));
+				smax = Math.max(Math.abs(smax), Math.abs(coeffMatrix[i][j]));
 			}//end force
 			scaling[i] = smax;
 		}//end for
 		
-		for(int k = 0; k < arraySize -1; k++) {
+		
+		
+		int maxInd;	
+		double r;
+		for(int k = 0; k < (arraySize-1); k++) {
 			double rmax = 0;
-			double maxInd = k;
-			double r;
+			maxInd = k; // Index vector
+			
 			for(int i = k; i < arraySize; i++) {
 				//ratio of coefficient to scaling factor
-				r = Math.abs(coeffMatrix[(int) ind[i]][k] / scaling[(int) ind[i]]);
-				if( r> rmax) {
+				r = Math.abs(coeffMatrix[ind[i]][k] / scaling[ind[i]]);
+				if( r > rmax) {
 					rmax = r;
 					maxInd = i;
 				}//end if		
 			}//end for
-			//swap(ind[maxInd, ind[k]
-			double temp = ind[(int) maxInd];
-			ind[(int)maxInd] = ind[k];
+
+			//swap(ind[maxInd], ind[k])
+			int temp = ind[maxInd];
+			ind[maxInd] = ind[k];
 			ind[k] = temp;
 			
 			for(int i = k+1; i < arraySize; i++) {
-				double mult = coeffMatrix[(int)ind[i]][k] / coeffMatrix[(int)ind[k]][k];
+				double mult = (coeffMatrix[ind[i]][k]) / (coeffMatrix[ind[k]][k]);
 				for(int j = k+1; j < arraySize; j++) {
-					coeffMatrix[(int)ind[i]][j] = coeffMatrix[(int)ind[i]][j] - (mult * coeffMatrix[(int)ind[k]][j]);
+					coeffMatrix[ind[i]][j] = coeffMatrix[ind[i]][j] - (mult * coeffMatrix[ind[k]][j]);
 				}//end for
 				
-				vectorB[(int)ind[i]] = vectorB[(int)ind[i]] - mult * vectorB[(int)ind[k]];
+				vectorB[ind[i]] = vectorB[ind[i]] - (mult * vectorB[ind[k]]);
 			}//end for
 		}//end for
-			System.out.println(Arrays.deepToString(coeffMatrix));
-			System.out.println(Arrays.toString(vectorB));
+		
+		//System.out.print(Arrays.deepToString(coeffMatrix));
+			
 	}//end function
-	public static void SPPBackSubst(double[][] coeffMatrix, double[] vectorB, double[] sol, double[] ind ) {
-		sol[arraySize] = vectorB[(int)ind[arraySize]] / coeffMatrix[(int)ind[arraySize]][arraySize];
+	public static void SPPBackSubst(double[][] coeffMatrix, double[] vectorB, double[] sol, int[] ind ) {
+		sol[arraySize-1] = vectorB[ind[arraySize-1]] / coeffMatrix[ind[arraySize-1]][arraySize-1];
 		double sum;
-		for( int i = (arraySize-2); i < arraySize; i++) {
-			sum = vectorB[(int)ind[i]];
+		for( int i = (arraySize-2); i > -1; i--) {
+			sum = vectorB[ind[i]];
 			for(int j = i+1; j < arraySize; j++) {
-				sum = sum - (coeffMatrix[(int)ind[i]][j] * sol[j]);
+				sum = sum - (coeffMatrix[ind[i]][j] * sol[j]);
 			}//end for
-			sol[i] = sum /coeffMatrix[(int)ind[i]][i];
+			sol[i] = sum / coeffMatrix[ind[i]][i];
 		}//end for
+		System.out.println(Arrays.toString(sol));
 	}//end function
 	public static void SPPGaussian(double[][] coeffMatrix, double[] vectorB) {
 		double[] sol = new double[arraySize];
-		double[] ind = new double[arraySize];
+		int[] ind = new int[arraySize]; //Index array
 		
 		for(int i = 0; i < arraySize; i++) {
 			ind[i] = i;
